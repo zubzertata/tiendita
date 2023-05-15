@@ -8,7 +8,6 @@ Este proyecto es una tienda en línea de mascotas desarrollada con Next.js, Supa
 - Detalles del producto: Se muestran detalles completos de cada mascota, incluyendo imágenes, descripción, precio y otros atributos relevantes.
 - Carrito de compras: Los usuarios pueden agregar mascotas al carrito de compras y realizar el pago mediante métodos de pago seguros.
 - Comentarios y calificaciones: Los usuarios pueden dejar comentarios y calificaciones sobre las mascotas que han comprado o con las que han interactuado.
-- Gestión de pedidos: Los administradores del sitio tienen acceso a un panel de administración donde pueden gestionar pedidos, actualizar el estado del envío, etc.
 
 ## Tecnologías utilizadas
 
