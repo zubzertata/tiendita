@@ -3,6 +3,8 @@ import { supabase } from '@/Lib/supabaseClient';
 import { useRouter } from 'next/router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { Modal, Button, Form, Container, Row, Col } from 'react-bootstrap';
+
 export default function SubirProducto() {
   const [idCategoria, setIdCategoria] = useState('');
   const [codigo, setCodigo] = useState('');
@@ -13,6 +15,7 @@ export default function SubirProducto() {
   const [categorias, setCategorias] = useState([]);
   const [urlImagen, setUrlImagen] = useState('');
   const router = useRouter();
+  const [mostrarAviso, setMostrarAviso] = useState(false); // Estado para mostrar/ocultar el aviso
 
   // Obtiene la lista de categorías desde la base de datos
   useEffect(() => {
@@ -26,7 +29,8 @@ export default function SubirProducto() {
     }
     fetchCategorias();
   }, []);
-  // Maneja la subida de un producto a la base de datos. Verifica si se seleccionó una imagen, luego sube la imagen al almacenamiento de Supabase y obtiene su URL. A continuación, inserta los datos del producto, incluyendo la URL de la imagen, en la tabla 'articulo'. Si ocurre algún error, se muestra un mensaje de error. Si se completa exitosamente, se reinician los campos del formulario y se muestra una alerta de éxito.
+
+  // Maneja la subida de un producto a la base de datos.
   async function handleSubmit(e) {
     e.preventDefault();
     try {
@@ -54,7 +58,7 @@ export default function SubirProducto() {
       if (response.error) {
         console.log('Error al subir producto:', response.error.message);
       } else {
-        alert('Producto subido exitosamente');
+        setMostrarAviso(true);
         setIdCategoria('');
         setCodigo('');
         setNombre('');
@@ -67,103 +71,112 @@ export default function SubirProducto() {
       console.log('Error al subir producto:', error.message);
     }
   }
+
+  const handleCloseAviso = () => {
+    setMostrarAviso(false);
+    router.push('/cuenta');
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <button className='btn' onClick={() => router.back()}>
-  <FontAwesomeIcon icon={faArrowLeft} /> Volver Atrás
-</button>
-      <div className="form-group">
-        <label htmlFor="nombre">Nombre:</label>
-        <input
-          type="text"
-          id="nombre"
-          name="nombre"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          className="form-control"
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="id_categoria">Categoría:</label>
-        <select
-          id="id_categoria"
-          name="id_categoria"
-          value={idCategoria}
-          onChange={(e) => setIdCategoria(parseInt(e.target.value))}
-          className="form-control"
-          required
-        >
-          <option value="">Seleccione una categoría</option>
-          {categorias.map((categoria) => (
-            <option key={categoria.id_categoria} value={categoria.id_categoria}>
-              {categoria.nombre}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="form-group">
-        <label htmlFor="codigo">Código:</label>
-        <input
-          type="text"
-          id="codigo"
-          name="codigo"
-          value={codigo}
-          onChange={(e) => setCodigo(e.target.value)}
-          className="form-control"
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="precio_venta">Precio de venta:</label>
-        <input
-          type="number"
-          id="precio_venta"
-          name="precio_venta"
-          value={precioVenta}
-          onChange={(e) => setPrecioVenta(e.target.value)}
-          className="form-control"
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="stock">Stock:</label>
-        <input
-          type="number"
-          id="stock"
-          name="stock"
-          value={stock}
-          onChange={(e) => setStock(e.target.value)}
-          className="form-control"
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="descripcion">Descripción:</label>
-        <textarea
-          id="descripcion"
-          name="descripcion"
-          value={descripcion}
-          onChange={(e) => setDescripcion(e.target.value)}
-          className="form-control"
-          rows="3"
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="imagen">Imagen:</label>
-        <input
-          type="file"
-          id="imagen"
-          name="imagen"
-          onChange={(e) => setUrlImagen(e.target.value)}
-          accept="image/*"
-          className="form-control-file"
-          required
-        />
-      </div>
-      <button type="submit" className="btn btn-primary">
-        Guardar
-      </button>
-    </form>
-    
+    <Container>
+      <Row>
+        <Col md={8} className="mx-auto">
+          <Button variant="secondary" onClick={() => router.back()} className="mb-3">
+            <FontAwesomeIcon icon={faArrowLeft} /> Volver Atrás
+          </Button>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group controlId="nombre">
+              <Form.Label>Nombre:</Form.Label>
+              <Form.Control
+                type="text"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group controlId="id_categoria">
+              <Form.Label>Categoría:</Form.Label>
+              <Form.Select
+                value={idCategoria}
+                onChange={(e) => setIdCategoria(parseInt(e.target.value))}
+                required
+              >
+                <option value="">Seleccione una categoría</option>
+                {categorias.map((categoria) => (
+                  <option key={categoria.id_categoria} value={categoria.id_categoria}>
+                    {categoria.nombre}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+
+            <Form.Group controlId="codigo">
+              <Form.Label>Código:</Form.Label>
+              <Form.Control
+                type="text"
+                value={codigo}
+                onChange={(e) => setCodigo(e.target.value)}
+              />
+            </Form.Group>
+
+            <Form.Group controlId="precio_venta">
+              <Form.Label>Precio de venta:</Form.Label>
+              <Form.Control
+                type="number"
+                value={precioVenta}
+                onChange={(e) => setPrecioVenta(e.target.value)}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group controlId="stock">
+              <Form.Label>Stock:</Form.Label>
+              <Form.Control
+                type="number"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group controlId="descripcion">
+              <Form.Label>Descripción:</Form.Label>
+              <Form.Control
+                as="textarea"
+                value={descripcion}
+                onChange={(e) => setDescripcion(e.target.value)}
+                rows={3}
+              />
+            </Form.Group>
+
+            <Form.Group controlId="imagen">
+              <Form.Label>Imagen:</Form.Label>
+              <Form.Control
+                type="file"
+                accept="image/*"
+                onChange={(e) => setUrlImagen(e.target.value)}
+                required
+              />
+            </Form.Group>
+
+            <Button type="submit" variant="primary" className="mb-3">
+              Guardar
+            </Button>
+          </Form>
+
+          <Modal show={mostrarAviso} onHide={handleCloseAviso}>
+            <Modal.Header closeButton>
+              <Modal.Title>¡El producto se ha creado exitosamente!</Modal.Title>
+            </Modal.Header>
+            <Modal.Footer>
+              <Button variant="primary" onClick={handleCloseAviso}>
+                Aceptar
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </Col>
+      </Row>
+    </Container>
   );
 }
